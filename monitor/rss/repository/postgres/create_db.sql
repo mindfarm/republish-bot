@@ -4,6 +4,7 @@ CREATE TABLE releases(
     content TEXT,
     link TEXT
 );
+/* Prepoulate the database with gopls releases */
 INSERT INTO public.releases (title, content, link, id) VALUES ('gopls/v0.5.5', '<h2>gopls/v0.5.5</h2>
 <p>This is a patch release to fix two bugs in <code>gopls/v0.5.4</code>.</p>
 <h2>Fixes</h2>
