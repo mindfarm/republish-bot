@@ -4,5 +4,5 @@ package publish
 
 // Platform -
 type Platform interface {
-	PublishContent(string) error
+	PublishContent(map[string]string) error
 }
