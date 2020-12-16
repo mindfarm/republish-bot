@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"unicode"
 
 	"github.com/dghubble/go-twitter/twitter"
@@ -68,9 +69,10 @@ func (t *twitterClient) chunkContent(content string) []string {
 }
 
 // PublishContent -
-func (t *twitterClient) PublishContent(content string) error {
+func (t *twitterClient) PublishContent(content map[string]string) error {
 	params := &twitter.StatusUpdateParams{}
-	for _, snippet := range t.chunkContent(content) {
+	c := strings.Join([]string{content["title"], content["link"]}, "\n\n")
+	for _, snippet := range t.chunkContent(c) {
 		tweet, resp, err := t.Statuses.Update(string(snippet), params)
 		if resp.StatusCode != http.StatusOK {
 			log.Printf("http return status was %d, with %s", resp.StatusCode, resp.Status)
