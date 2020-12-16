@@ -26,7 +26,19 @@ type client struct {
 
 // NewRedditClient -
 //nolint:golint
-func NewRedditClient(username, password, clientID, clientSecret string) *client {
+func NewRedditClient(username, password, clientID, clientSecret string) (*client, error) {
+	if username == "" {
+		return nil, fmt.Errorf("no username supplied")
+	}
+	if password == "" {
+		return nil, fmt.Errorf("no password supplied")
+	}
+	if clientID == "" {
+		return nil, fmt.Errorf("no clientID supplied")
+	}
+	if clientSecret == "" {
+		return nil, fmt.Errorf("no clientSecret supplied")
+	}
 	c := &client{
 		ClientID:     clientID,
 		clientSecret: clientSecret,
@@ -36,7 +48,7 @@ func NewRedditClient(username, password, clientID, clientSecret string) *client 
 		password:     password,
 	}
 
-	return c
+	return c, nil
 }
 
 func (c *client) doRequest(request *http.Request) (response *http.Response, err error) {
@@ -122,7 +134,7 @@ func (c *client) Post(resourceURL string, values url.Values) (*http.Response, er
 	return c.doRequest(req)
 }
 
-func (c *client) PublishContent(content map[string]string) (*http.Response, error) {
+func (c *client) PublishContent(content map[string]string) error {
 	resourceURL := "/api/submit"
 	values := url.Values{
 		"kind":  {"self"},
@@ -134,7 +146,9 @@ func (c *client) PublishContent(content map[string]string) (*http.Response, erro
 Further information can be found at %s
 
 `, content["content"], content["link"])}}
-	return c.Post(resourceURL, values)
+
+	_, err := c.Post(resourceURL, values)
+	return err
 
 }
 

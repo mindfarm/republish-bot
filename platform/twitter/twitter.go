@@ -71,7 +71,7 @@ func (t *twitterClient) chunkContent(content string) []string {
 // PublishContent -
 func (t *twitterClient) PublishContent(content map[string]string) error {
 	params := &twitter.StatusUpdateParams{}
-	c := strings.Join([]string{content["title"], content["link"]}, "\n\n")
+	c := strings.Join([]string{content["title"], " is now available.", "\n\n", "Further information can be found at: ", content["link"]}, "")
 	for _, snippet := range t.chunkContent(c) {
 		tweet, resp, err := t.Statuses.Update(string(snippet), params)
 		if resp.StatusCode != http.StatusOK {
