@@ -51,30 +51,30 @@ func NewWatched(store store.Storage, urls ...string) (*watched, error) {
 	return r, nil
 }
 
-func (w *watched) GetReleases() ([][]string, error) {
+func (w *watched) GetReleases() ([]map[string]string, error) {
 	return w.GetUnseenReleases()
 }
 
 // GetUnseenReleases - get previously unseen releases
-func (w *watched) GetUnseenReleases() ([][]string, error) {
+func (w *watched) GetUnseenReleases() ([]map[string]string, error) {
 	w.update()
-	unseen := [][]string{}
+	unseen := []map[string]string{}
 	for i := range w.Feeds {
 		for j := range w.Feeds[i].Feed.Items {
 			title := w.Feeds[i].Feed.Items[j].Title
 			seen, err := w.Store.CheckExists(title)
 			if err != nil {
 				log.Printf("unable to check %q with error %v", title, err)
-				return [][]string{}, fmt.Errorf("unable to check store with error %w", err)
+				return nil, fmt.Errorf("unable to check store with error %w", err)
 			}
 			if !seen {
 				content := w.Feeds[i].Feed.Items[j].Content
 				link := w.Feeds[i].Feed.Items[j].Link
 				if err := w.Store.CreateItem(title, content, link); err != nil {
 					log.Printf("unable to create %q with error %v", title, err)
-					return [][]string{}, fmt.Errorf("unable to create item with error %w", err)
+					return nil, fmt.Errorf("unable to create item with error %w", err)
 				}
-				unseen = append(unseen, []string{title, content, link})
+				unseen = append(unseen, map[string]string{"title": title, "content": content, "link": link})
 			}
 		}
 	}
