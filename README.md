@@ -22,7 +22,6 @@ export RELEASE_URL="https://github.com/golang/tools/releases.atom"
 Create drivers that will allow the bot to publish to other platforms, such as
   - Slack
   - Usenet
-  - Facebook
   - IRC
   - Direct mailing lists
 
@@ -33,3 +32,6 @@ Create the ability to read configuration from other sources, such as
   - HCF
   - YAML
   - JSON
+
+This code is used for [AGopls](https://twitter.com/AGopl://twitter.com/AGopls)
+and [/u/announce_bot](https://www.reddit.com/user/announce_bot)
