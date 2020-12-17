@@ -10,19 +10,33 @@ described below is for that set-up.
 
 #Configuration
 ```bash
+# The RSS/Atom feed the bot is watching
+export RELEASE_URL="https://github.com/golang/tools/releases.atom"
+
+# Postgres Credentials
+export POSTGRES_DATABASE="user=REDACTED dbname=REDACTED sslmode=disable password=REDACTED"
+
+# Twitter Credentials
 export TWITTER_API_KEY="REDACTED"
 export TWITTER_API_SECRET="REDACTED"
 export TWITTER_ACCESS_TOKEN="REDACTED-REDACTED"
 export TWITTER_ACCESS_TOKEN_SECRET="REDACTED"
-export POSTGRES_DATABASE="user=bot dbname=REDACTED sslmode=disable password=REDACTED"
-export RELEASE_URL="https://github.com/golang/tools/releases.atom"
+
+# Reddit Credentials
+export REDDIT_CLIENT_ID="REDACTED"
+export REDDIT_CLIENT_SECRET="REDACTED"
+export REDDIT_USERNAME="announce_bot" # change as necessary
+export REDDIT_PASSWORD="REDACTED"
+
+# Freenode credentials
+export FREENODE_NICK="announce-bot"  # change as necessary
+export FREENODE_PASSWORD="REDACTED"
 ```
 
 #TODO
 Create drivers that will allow the bot to publish to other platforms, such as
   - Slack
   - Usenet
-  - IRC
   - Direct mailing lists
 
 Create other repository drivers, so that the bot can be used with other SQL or
@@ -34,4 +48,5 @@ Create the ability to read configuration from other sources, such as
   - JSON
 
 This code is used for [AGopls](https://twitter.com/AGopl://twitter.com/AGopls)
+announce-bot on [Freenode](https://freenode.net/)
 and [/u/announce_bot](https://www.reddit.com/user/announce_bot)
