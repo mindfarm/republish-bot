@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"reflect"
+	"time"
 
 	store "github.com/mindfarm/republish-bot/monitor/rss/repository"
 	"github.com/mmcdole/gofeed"
@@ -57,7 +58,17 @@ func (w *watched) GetReleases() ([]map[string]string, error) {
 
 // GetUnseenReleases - get previously unseen releases
 func (w *watched) GetUnseenReleases() ([]map[string]string, error) {
-	w.update()
+	// Keep trying for up to 30 seconds (In case there is an upstream site issue)
+	maxWait := 6
+	for maxWait > 0 {
+		err := w.update()
+		if err != nil {
+			time.Sleep(time.Second * 5)
+			maxWait--
+		} else {
+			break
+		}
+	}
 	unseen := []map[string]string{}
 	for i := range w.Feeds {
 		for j := range w.Feeds[i].Feed.Items {
@@ -82,16 +93,17 @@ func (w *watched) GetUnseenReleases() ([]map[string]string, error) {
 }
 
 // Update - fetch all items for all feeds
-func (w *watched) update() {
+func (w *watched) update() error {
 	fp := gofeed.NewParser()
 	for idx := range w.Feeds {
 		url := w.Feeds[idx].URL
 		feed, err := w.fetchURL(fp, url)
 		if err != nil {
-			log.Printf("error fetching url: %s, err: %v", url, err)
+			return fmt.Errorf("error fetching url: %s, err: %v", url, err)
 		}
 		w.Feeds[idx].Feed = feed
 	}
+	return nil
 }
 
 // FetchURL fetches the feed URL and also fakes the user-agent to be able
