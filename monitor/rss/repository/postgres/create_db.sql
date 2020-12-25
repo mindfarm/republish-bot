@@ -96,3 +96,59 @@ This should not have affected any clients.</p>
 <p><a class="user-mention" data-hovercard-type="user" data-hovercard-url="/users/heschik/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/heschik">@heschik</a> <a class="user-mention" data-hovercard-type="user" data-hovercard-url="/users/findleyr/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/findleyr">@findleyr</a> <a class="user-mention" data-hovercard-type="user" data-hovercard-url="/users/dandua98/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/dandua98">@dandua98</a> <a class="user-mention" data-hovercard-type="user" data-hovercard-url="/users/pjweinb/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/pjweinb">@pjweinb</a> <a class="user-mention" data-hovercard-type="user" data-hovercard-url="/users/leitzler/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/leitzler">@leitzler</a> <a class="user-mention" data-hovercard-type="user" data-hovercard-url="/users/kortschak/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/kortschak">@kortschak</a> <a class="user-mention" data-hovercard-type="user" data-hovercard-url="/users/bcmills/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/bcmills">@bcmills</a> <a class="user-mention" data-hovercard-type="user" data-hovercard-url="/users/hyangah/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/hyangah">@hyangah</a> <a class="user-mention" data-hovercard-type="user" data-hovercard-url="/users/jadekler/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/jadekler">@jadekler</a></p>', 'https://github.com/golang/tools/releases/tag/gopls%2Fv0.5.2', NULL);
 INSERT INTO public.releases (title, content, link, id) VALUES ('gopls/v0.5.2-pre.2', '<p>gopls/v0.5.2-pre.2</p>', 'https://github.com/golang/tools/releases/tag/gopls%2Fv0.5.2-pre.2', NULL);
 INSERT INTO public.releases (title, content, link, id) VALUES ('gopls/v0.6.0-pre.1', '<p>gopls/v0.6.0-pre.1</p>', 'https://github.com/golang/tools/releases/tag/gopls%2Fv0.6.0-pre.1', NULL);
+<p><a class="user-mention" data-hovercard-type="user" data-hovercard-url="/users/heschik/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/heschik">@heschik</a> <a class="user-mention" data-hovercard-type="user" data-hovercard-url="/users/findleyr/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/findleyr">@findleyr</a> <a class="user-mention" data-hovercard-type="user" data-hovercard-url="/users/pjweinb/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href="https://github.com/pjweinb">@pjweinb</a></p>', 'https://github.com/golang/tools/releases/tag/gopls%2Fv0.5.3');
+INSERT INTO releases (id, title, content, link) VALUES (NULL, 'gopls/v0.5.3-pre.2', '<p>gopls/v0.5.3-pre.2</p>', 'https://github.com/golang/tools/releases/tag/gopls%2Fv0.5.3-pre.2');
+INSERT INTO releases (id, title, content, link) VALUES (NULL, 'go1.16beta1: api: promote next to go1.16', '<p>Change-Id: Id7d242ddd4b80a763787513d0a658dd7aea9db7d<br>
+Reviewed-on: <a href="https://go-review.googlesource.com/c/go/+/276454" rel="nofollow">https://go-review.googlesource.com/c/go/+/276454</a><br>
+Run-TryBot: Dmitri Shuralyov <a href="mailto:dmitshur@golang.org">dmitshur@golang.org</a><br>
+TryBot-Result: Go Bot <a href="mailto:gobot@golang.org">gobot@golang.org</a><br>
+Trust: Dmitri Shuralyov <a href="mailto:dmitshur@golang.org">dmitshur@golang.org</a><br>
+Reviewed-by: Alexander Rakoczy <a href="mailto:alex@golang.org">alex@golang.org</a><br>
+Reviewed-by: Carlos Amedee <a href="mailto:carlos@golang.org">carlos@golang.org</a></p>', 'https://github.com/golang/go/releases/tag/go1.16beta1');
+INSERT INTO releases (id, title, content, link) VALUES (NULL, '[release-branch.go1.15] go1.15.6', '<p>Change-Id: I9e050e1463f1bc01c04d1817aef2f81a5aac4d42<br>
+Reviewed-on: <a href="https://go-review.googlesource.com/c/go/+/275132" rel="nofollow">https://go-review.googlesource.com/c/go/+/275132</a><br>
+Run-TryBot: Carlos Amedee <a href="mailto:carlos@golang.org">carlos@golang.org</a><br>
+TryBot-Result: Go Bot <a href="mailto:gobot@golang.org">gobot@golang.org</a><br>
+Reviewed-by: Dmitri Shuralyov <a href="mailto:dmitshur@golang.org">dmitshur@golang.org</a><br>
+Trust: Carlos Amedee <a href="mailto:carlos@golang.org">carlos@golang.org</a></p>', 'https://github.com/golang/go/releases/tag/go1.15.6');
+INSERT INTO releases (id, title, content, link) VALUES (NULL, '[release-branch.go1.14] go1.14.13', '<p>Change-Id: Ifdfd9cd7edb8c3afd785cf75e818e3d301cd8dae<br>
+Reviewed-on: <a href="https://go-review.googlesource.com/c/go/+/275133" rel="nofollow">https://go-review.googlesource.com/c/go/+/275133</a><br>
+Run-TryBot: Carlos Amedee <a href="mailto:carlos@golang.org">carlos@golang.org</a><br>
+TryBot-Result: Go Bot <a href="mailto:gobot@golang.org">gobot@golang.org</a><br>
+Reviewed-by: Dmitri Shuralyov <a href="mailto:dmitshur@golang.org">dmitshur@golang.org</a><br>
+Trust: Carlos Amedee <a href="mailto:carlos@golang.org">carlos@golang.org</a></p>', 'https://github.com/golang/go/releases/tag/go1.14.13');
+INSERT INTO releases (id, title, content, link) VALUES (NULL, '[release-branch.go1.15-security] go1.15.5', '<p>Change-Id: Id3b116c0f54c2131111bc8afacb8d81d06f96461<br>
+Reviewed-on: <a href="https://team-review.git.corp.google.com/c/golang/go-private/+/901407" rel="nofollow">https://team-review.git.corp.google.com/c/golang/go-private/+/901407</a><br>
+Reviewed-by: Katie Hockman <a href="mailto:katiehockman@google.com">katiehockman@google.com</a></p>', 'https://github.com/golang/go/releases/tag/go1.15.5');
+INSERT INTO releases (id, title, content, link) VALUES (NULL, '[release-branch.go1.14-security] go1.14.12', '<p>Change-Id: I8ce7093f7e119216d3a5d8941968788b70b6afaf<br>
+Reviewed-on: <a href="https://team-review.git.corp.google.com/c/golang/go-private/+/901408" rel="nofollow">https://team-review.git.corp.google.com/c/golang/go-private/+/901408</a><br>
+Reviewed-by: Katie Hockman <a href="mailto:katiehockman@google.com">katiehockman@google.com</a></p>', 'https://github.com/golang/go/releases/tag/go1.14.12');
+INSERT INTO releases (id, title, content, link) VALUES (NULL, '[release-branch.go1.15] go1.15.4', '<p>Change-Id: Ibcd61e2c7ef7cc6f8509dadea6c3952c5dd7016e<br>
+Reviewed-on: <a href="https://go-review.googlesource.com/c/go/+/267879" rel="nofollow">https://go-review.googlesource.com/c/go/+/267879</a><br>
+Run-TryBot: Alexander Rakoczy <a href="mailto:alex@golang.org">alex@golang.org</a><br>
+TryBot-Result: Go Bot <a href="mailto:gobot@golang.org">gobot@golang.org</a><br>
+Reviewed-by: Dmitri Shuralyov <a href="mailto:dmitshur@golang.org">dmitshur@golang.org</a><br>
+Trust: Alexander Rakoczy <a href="mailto:alex@golang.org">alex@golang.org</a></p>', 'https://github.com/golang/go/releases/tag/go1.15.4');
+INSERT INTO releases (id, title, content, link) VALUES (NULL, '[release-branch.go1.14] go1.14.11', '<p>Change-Id: I1b4231179d0825113f2cbb6e84e92b3453e2ee45<br>
+Reviewed-on: <a href="https://go-review.googlesource.com/c/go/+/267878" rel="nofollow">https://go-review.googlesource.com/c/go/+/267878</a><br>
+Run-TryBot: Alexander Rakoczy <a href="mailto:alex@golang.org">alex@golang.org</a><br>
+TryBot-Result: Go Bot <a href="mailto:gobot@golang.org">gobot@golang.org</a><br>
+Reviewed-by: Dmitri Shuralyov <a href="mailto:dmitshur@golang.org">dmitshur@golang.org</a><br>
+Trust: Alexander Rakoczy <a href="mailto:alex@golang.org">alex@golang.org</a></p>', 'https://github.com/golang/go/releases/tag/go1.14.11');
+INSERT INTO releases (id, title, content, link) VALUES (NULL, '[release-branch.go1.15] go1.15.3', '<p>Change-Id: I8a45870039d0d3f210d883c464a7fed2abd9e28b<br>
+Reviewed-on: <a href="https://go-review.googlesource.com/c/go/+/262337" rel="nofollow">https://go-review.googlesource.com/c/go/+/262337</a><br>
+Run-TryBot: Alexander Rakoczy <a href="mailto:alex@golang.org">alex@golang.org</a><br>
+Reviewed-by: Dmitri Shuralyov <a href="mailto:dmitshur@golang.org">dmitshur@golang.org</a><br>
+TryBot-Result: Go Bot <a href="mailto:gobot@golang.org">gobot@golang.org</a><br>
+Trust: Alexander Rakoczy <a href="mailto:alex@golang.org">alex@golang.org</a></p>', 'https://github.com/golang/go/releases/tag/go1.15.3');
+INSERT INTO releases (id, title, content, link) VALUES (NULL, '[release-branch.go1.14] go1.14.10', '<p>Change-Id: Ia983336cdedc9fa835bfc792dd1e819eef31596f<br>
+Reviewed-on: <a href="https://go-review.googlesource.com/c/go/+/262338" rel="nofollow">https://go-review.googlesource.com/c/go/+/262338</a><br>
+Run-TryBot: Alexander Rakoczy <a href="mailto:alex@golang.org">alex@golang.org</a><br>
+Reviewed-by: Dmitri Shuralyov <a href="mailto:dmitshur@golang.org">dmitshur@golang.org</a><br>
+TryBot-Result: Go Bot <a href="mailto:gobot@golang.org">gobot@golang.org</a><br>
+Trust: Alexander Rakoczy <a href="mailto:alex@golang.org">alex@golang.org</a></p>', 'https://github.com/golang/go/releases/tag/go1.14.10');
+INSERT INTO releases (id, title, content, link) VALUES (NULL, '[release-branch.go1.15] go1.15.2', '<p>Change-Id: I876e199ac276e42cd98bf36d22eaacf26506a975<br>
+Reviewed-on: <a href="https://go-review.googlesource.com/c/go/+/253717" rel="nofollow">https://go-review.googlesource.com/c/go/+/253717</a><br>
+Reviewed-by: Alexander Rakoczy <a href="mailto:alex@golang.org">alex@golang.org</a><br>
+Run-TryBot: Dmitri Shuralyov <a href="mailto:dmitshur@golang.org">dmitshur@golang.org</a><br>
+TryBot-Result: Gobot Gobot <a href="mailto:gobot@golang.org">gobot@golang.org</a></p>', 'https://github.com/golang/go/releases/tag/go1.15.2');
