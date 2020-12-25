@@ -155,11 +155,9 @@ func (c *client) PublishContent(content map[string]string) error {
 		"sr":    {"golang"},
 		"title": {content["title"]},
 		"text": {fmt.Sprintf(`
-%s
-
 Further information can be found at %s
 
-`, content["content"], content["link"])}}
+`, content["link"])}}
 
 	_, err := c.Post(resourceURL, values)
 	return err
