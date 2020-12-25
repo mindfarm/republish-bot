@@ -71,7 +71,23 @@ func (t *twitterClient) chunkContent(content string) []string {
 // PublishContent -
 func (t *twitterClient) PublishContent(content map[string]string) error {
 	params := &twitter.StatusUpdateParams{}
-	c := strings.Join([]string{content["title"], " is now available.", "\n\n", "Further information can be found at: ", content["link"]}, "")
+
+	title := content["title"]
+	// Twitter should not publish pre-releases (only possible where pre has been
+	// included in the title of the release, as is the case with go-pls)
+	if strings.ContainsAny(title, "pre") {
+		log.Printf("Twitter: Ignoring a pre-release %s", content["title"])
+		return nil
+	}
+
+	// Go project has a weird title structure
+	// [release-branch.go1.15] go1.15.2
+	tmp := strings.Split(title, "]")
+	if len(tmp) > 1 {
+		title = strings.TrimSpace(tmp[1])
+	}
+
+	c := strings.Join([]string{title, " is now available.", "\n\n", "Further information can be found at: ", content["link"]}, "")
 	for _, snippet := range t.chunkContent(c) {
 		tweet, resp, err := t.Statuses.Update(string(snippet), params)
 		if resp.StatusCode != http.StatusOK {

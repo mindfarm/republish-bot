@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/textproto"
+	"strings"
 	"time"
 )
 
@@ -71,11 +72,16 @@ func (c *client) PublishContent(content map[string]string) error {
 			return fmt.Errorf("cannot chat with error %w", err)
 		}
 	}
+	title := content["title"]
+	// Go project has a weird title structure
+	// [release-branch.go1.15] go1.15.2
+	tmp := strings.Split(title, "]")
+	if len(tmp) > 1 {
+		title = strings.TrimSpace(tmp[1])
+	}
 	// Send release information
 	s := fmt.Sprintf("PRIVMSG %s :Release Announcement", channel)
-	c.writer.PrintfLine(s)
-	time.Sleep(time.Millisecond * 500)
-	s = fmt.Sprintf("PRIVMSG %s :%s is now available.", channel, content["title"])
+	s += fmt.Sprintf(" %s is now available.", title)
 	c.writer.PrintfLine(s)
 	time.Sleep(time.Millisecond * 500)
 	s = fmt.Sprintf("PRIVMSG %s :Further information can be found at %s", channel, content["link"])

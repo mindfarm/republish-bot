@@ -4,6 +4,7 @@ package reddit
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -135,6 +136,19 @@ func (c *client) Post(resourceURL string, values url.Values) (*http.Response, er
 }
 
 func (c *client) PublishContent(content map[string]string) error {
+	title := content["title"]
+	// Reddit should not publish pre-releases (only possible where pre has been
+	// included in the title of the release, as is the case with go-pls)
+	if strings.ContainsAny(title, "pre") {
+		log.Printf("REDDIT: Ignoring a pre-release %s", content["title"])
+		return nil
+	}
+	// Go project has a weird title structure
+	// [release-branch.go1.15] go1.15.2
+	tmp := strings.Split(title, "]")
+	if len(tmp) > 1 {
+		title = strings.TrimSpace(tmp[1])
+	}
 	resourceURL := "/api/submit"
 	values := url.Values{
 		"kind":  {"self"},
