@@ -3,16 +3,13 @@ A simple relay bot
 This bot will watch a given set of RSS feeds and will (re)publish the
 information found in the RSS item to the configured platforms.
 
-As the bot is set right now it will watch the supplied RSS/atom feed and
+As the bot is set right now it will watch the hardcoded RSS/atom feeds and
 republish new items to Twitter, saving those that have already been seen to the
 local database (currently Postgres). Therefore the configuration information
 described below is for that set-up.
 
 #Configuration
 ```bash
-# The RSS/Atom feed the bot is watching
-export RELEASE_URL="https://github.com/golang/tools/releases.atom"
-
 # Postgres Credentials
 export POSTGRES_DATABASE="user=REDACTED dbname=REDACTED sslmode=disable password=REDACTED"
 
