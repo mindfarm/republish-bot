@@ -1,0 +1,13 @@
+[Unit]
+Description=Republish Bot
+
+[Service]
+Type=simple
+EnvironmentFile=/root/environment.variables.file # change as necessary
+ExecStart=/home/bot_user/go/bin/republish-bot # change as necessary
+User=bot_user # change as necessary
+Group=bot_user # change as necessary
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
