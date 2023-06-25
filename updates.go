@@ -1,5 +1,4 @@
-// Package monitor -
-package monitor
+package republishbot
 
 // Updates -
 type Updates interface {

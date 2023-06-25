@@ -4,11 +4,10 @@ package main
 import (
 	"log"
 	"os"
-	"time"
 
+	republishbot "github.com/mindfarm/republish-bot"
 	"github.com/mindfarm/republish-bot/monitor/rss"
 	postgresstore "github.com/mindfarm/republish-bot/monitor/rss/repository/postgres"
-	publish "github.com/mindfarm/republish-bot/platform"
 	"github.com/mindfarm/republish-bot/platform/reddit"
 	"github.com/mindfarm/republish-bot/platform/twitter"
 )
@@ -25,7 +24,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to create twitter client with error %v", err)
 	}
-	platforms := map[string]publish.Platform{}
+
+	platforms := map[string]republishbot.Platform{}
 	platforms["twitter"] = tc
 
 	// Collect Reddit credentials
@@ -39,6 +39,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to create reddit client with error %v", err)
 	}
+
 	platforms["reddit"] = rc
 
 	//TODO Create clients for other platforms (eg. Usenet, Slack, Direct Mail lists)
@@ -57,19 +58,5 @@ func main() {
 		log.Fatalf("Unable to create new watched instance with error %v", err)
 	}
 
-	for {
-		releases, err := w.GetReleases()
-		if err != nil {
-			log.Printf("WARNING GetReleases() returned error %v", err)
-		}
-		for idx := range releases {
-			for k := range platforms {
-				if err := platforms[k].PublishContent(releases[idx]); err != nil {
-					log.Printf("WARNING PublishContent() returned error %v for %s", err, releases[idx])
-				}
-			}
-		}
-		// Sleep and check again in 30 seconds
-		time.Sleep(time.Second * 30)
-	}
+	republishbot.Republish(platforms, w)
 }

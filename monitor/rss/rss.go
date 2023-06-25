@@ -8,7 +8,6 @@ import (
 	"reflect"
 	"time"
 
-	store "github.com/mindfarm/republish-bot/monitor/rss/repository"
 	"github.com/mmcdole/gofeed"
 )
 
@@ -18,11 +17,11 @@ type watched struct {
 		URL  string
 		Feed *gofeed.Feed
 	}
-	Store store.Storage
+	Store Storage
 }
 
-// check that the concrete instance passed in as a store.Storage is not nil
-func isNilFixed(i store.Storage) bool {
+// check that the concrete instance passed in as a Storage is not nil
+func isNilFixed(i Storage) bool {
 	if i == nil {
 		return true
 	}
@@ -34,8 +33,9 @@ func isNilFixed(i store.Storage) bool {
 }
 
 // NewWatched - create a new watched instance
+//
 //nolint:golint
-func NewWatched(store store.Storage, urls ...string) (*watched, error) {
+func NewWatched(store Storage, urls ...string) (*watched, error) {
 	if isNilFixed(store) {
 		return nil, fmt.Errorf("no store supplied cannot continue")
 	}

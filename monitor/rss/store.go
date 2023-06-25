@@ -1,5 +1,4 @@
-// Package store -
-package store
+package rss
 
 // Storage -
 type Storage interface {
