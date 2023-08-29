@@ -4,10 +4,12 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
-	republishbot "github.com/mindfarm/republish-bot"
 	"github.com/mindfarm/republish-bot/monitor/rss"
 	postgresstore "github.com/mindfarm/republish-bot/monitor/rss/repository/postgres"
+
+	republishbot "github.com/mindfarm/republish-bot"
 	"github.com/mindfarm/republish-bot/platform/reddit"
 	"github.com/mindfarm/republish-bot/platform/twitter"
 )
