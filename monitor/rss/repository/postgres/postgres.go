@@ -32,9 +32,9 @@ func NewPGStore(connStr string) (*pg, error) {
 }
 
 // CheckExists - check if a release exists with the nominated title
-func (pg *pg) CheckExists(title string) (bool, error) {
+func (pg *pg) CheckExists(feed, title string) (bool, error) {
 	var tmpTitle sql.NullString
-	err := pg.dbConn.QueryRow("select title from releases where title = $1", title).Scan(&tmpTitle)
+	err := pg.dbConn.QueryRow("select title from releases where feed = $1 and title = $2", feed, title).Scan(&tmpTitle)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return false, fmt.Errorf("unable to query releases with error %w", err)
 	}
@@ -43,11 +43,11 @@ func (pg *pg) CheckExists(title string) (bool, error) {
 }
 
 // CreateItem - create a new release item in the database
-func (pg *pg) CreateItem(title, content, link string) error {
+func (pg *pg) CreateItem(feed, title, content, link string) error {
 	var id sql.NullInt64
 	sqlStatement := `
-	INSERT INTO releases (title, content, link)
-	VALUES ($1, $2, $3)
+	INSERT INTO releases (feed, title, content, link)
+	VALUES ($1, $2, $3, $4)
 	RETURNING id`
-	return pg.dbConn.QueryRow(sqlStatement, title, content, link).Scan(&id)
+	return pg.dbConn.QueryRow(sqlStatement, feed, title, content, link).Scan(&id)
 }

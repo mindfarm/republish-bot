@@ -2,6 +2,6 @@ package rss
 
 // Storage -
 type Storage interface {
-	CheckExists(title string) (bool, error)
-	CreateItem(title, content, link string) error
+	CheckExists(feed, title string) (bool, error)
+	CreateItem(feed, title, content, link string) error
 }

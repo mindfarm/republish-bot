@@ -53,13 +53,11 @@ func main() {
 	}
 
 	// Retrieve content
-	releaseURLs := []string{"https://github.com/golang/tools/releases.atom", "https://github.com/golang/go/releases.atom"}
 	w, err := rss.NewWatched(db, releaseURLs...)
 	if err != nil {
 		log.Fatalf("Unable to create new watched instance with error %v", err)
 	}
 
-	republishbot.Republish(platforms, w)
 	for {
 		slog.Debug("Start of infinite loop")
 		releases, err := w.GetReleases()
