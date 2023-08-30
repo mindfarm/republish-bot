@@ -37,8 +37,8 @@ func NewFreenodeClient(username, password string) (*client, error) {
 }
 
 // chat.freenode.net on ports 6665-6667 and 8000-8002 for plain-text connections, or ports 6697, 7000 and 7070 for TLS-encrypted connections.
-const freenode = "chat.freenode.net:6665"
-const channel = "#go-nuts"
+const freenode = "irc.libera.chat:6665"
+const channel = "#software-development"
 
 func (c *client) connect() error {
 	conn, err := net.Dial("tcp", freenode)
@@ -83,7 +83,7 @@ func (c *client) PublishContent(content map[string]string) error {
 		title = strings.TrimSpace(tmp[1])
 	}
 	// Send release information
-	s := fmt.Sprintf("PRIVMSG %s :Release Announcement", channel)
+	s := fmt.Sprintf("PRIVMSG %s :Blog Announcement", channel)
 	s += fmt.Sprintf(" %s is now available.", title)
 	c.writer.PrintfLine(s)
 	time.Sleep(time.Millisecond * 500)
@@ -93,7 +93,8 @@ func (c *client) PublishContent(content map[string]string) error {
 	// why the server won't print out what's sent if I disconnect before this
 	// time amount.
 	time.Sleep(time.Second * 7)
-	return c.disconnect()
+	// return c.disconnect()
+	return nil
 }
 
 func (c *client) disconnect() error {

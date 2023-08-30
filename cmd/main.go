@@ -11,6 +11,7 @@ import (
 	postgresstore "github.com/mindfarm/republish-bot/monitor/rss/repository/postgres"
 
 	republishbot "github.com/mindfarm/republish-bot"
+	irc "github.com/mindfarm/republish-bot/platform/irc-freenode"
 )
 
 func main() {
@@ -18,29 +19,17 @@ func main() {
 	h := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: programLevel})
 	slog.SetDefault(slog.New(h))
 	programLevel.Set(slog.LevelInfo)
+	// Collect IRC credentials
+	ircUsername := os.Getenv("IRC_USER")
+	ircPassword := os.Getenv("IRC_PASSWORD")
 
-	// Create the Twitter client
-	tc, err := twitter.NewTwitterClient(twitterAPIKey, twitterAPISecret, twitterAccessToken, twitterAccessTokenSecret)
+	// Create the IRC client
+	tc, err := irc.NewFreenodeClient(ircUsername, ircPassword)
 	if err != nil {
-		log.Fatalf("Unable to create twitter client with error %v", err)
+		log.Fatalf("Unable to create irc client with error %v", err)
 	}
-
 	platforms := map[string]republishbot.Platform{}
-	platforms["twitter"] = tc
-
-	// Collect Reddit credentials
-	redditClientID := os.Getenv("REDDIT_CLIENT_ID")
-	redditClientSecret := os.Getenv("REDDIT_CLIENT_SECRET")
-	redditUsername := os.Getenv("REDDIT_USERNAME")
-	redditPassword := os.Getenv("REDDIT_PASSWORD")
-
-	// Create the Reddit client
-	rc, err := reddit.NewRedditClient(redditUsername, redditPassword, redditClientID, redditClientSecret)
-	if err != nil {
-		log.Fatalf("Unable to create reddit client with error %v", err)
-	}
-
-	platforms["reddit"] = rc
+	platforms["irc"] = tc
 
 	//TODO Create clients for other platforms (eg. Usenet, Slack, Direct Mail lists)
 
