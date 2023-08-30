@@ -3,6 +3,7 @@ package main
 
 import (
 	"log"
+	"log/slog"
 	"os"
 	"time"
 
@@ -10,16 +11,13 @@ import (
 	postgresstore "github.com/mindfarm/republish-bot/monitor/rss/repository/postgres"
 
 	republishbot "github.com/mindfarm/republish-bot"
-	"github.com/mindfarm/republish-bot/platform/reddit"
-	"github.com/mindfarm/republish-bot/platform/twitter"
 )
 
 func main() {
-	// Collect Twitter credentials
-	twitterAPIKey := os.Getenv("TWITTER_API_KEY")
-	twitterAPISecret := os.Getenv("TWITTER_API_SECRET")
-	twitterAccessToken := os.Getenv("TWITTER_ACCESS_TOKEN")
-	twitterAccessTokenSecret := os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
+	var programLevel = new(slog.LevelVar)
+	h := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: programLevel})
+	slog.SetDefault(slog.New(h))
+	programLevel.Set(slog.LevelInfo)
 
 	// Create the Twitter client
 	tc, err := twitter.NewTwitterClient(twitterAPIKey, twitterAPISecret, twitterAccessToken, twitterAccessTokenSecret)
@@ -48,6 +46,7 @@ func main() {
 
 	// Connect to the github specific data store
 	pgDB := os.Getenv("POSTGRES_DATABASE")
+	slog.Debug("PG", pgDB)
 	db, err := postgresstore.NewPGStore(pgDB)
 	if err != nil {
 		log.Fatalf("Unable to create postgres connection with error %v", err)
@@ -61,4 +60,21 @@ func main() {
 	}
 
 	republishbot.Republish(platforms, w)
+	for {
+		slog.Debug("Start of infinite loop")
+		releases, err := w.GetReleases()
+		if err != nil {
+			log.Printf("WARNING GetReleases() returned error %v", err)
+		}
+		for idx := range releases {
+			slog.Debug("Publishing ", "value", item["title"])
+			for k := range platforms {
+				if err := platforms[k].PublishContent(releases[idx]); err != nil {
+					log.Printf("WARNING PublishContent() returned error %v for %s", err, releases[idx])
+				}
+			}
+		}
+		// Sleep and check again in 30 seconds
+		time.Sleep(time.Second * 30)
+	}
 }

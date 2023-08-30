@@ -4,6 +4,7 @@ package rss
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"reflect"
 	"time"
@@ -34,7 +35,7 @@ func isNilFixed(i Storage) bool {
 
 // NewWatched - create a new watched instance
 //
-//nolint:golint
+//nolint:golint,revive
 func NewWatched(store Storage, urls ...string) (*watched, error) {
 	if isNilFixed(store) {
 		return nil, fmt.Errorf("no store supplied cannot continue")
@@ -44,6 +45,7 @@ func NewWatched(store Storage, urls ...string) (*watched, error) {
 	}
 	r := &watched{Store: store}
 	for _, u := range urls {
+		// slog.Debug("Adding URL: ", u)
 		r.Feeds = append(r.Feeds, struct {
 			URL  string
 			Feed *gofeed.Feed
@@ -59,6 +61,7 @@ func (w *watched) GetReleases() ([]map[string]string, error) {
 // GetUnseenReleases - get previously unseen releases
 func (w *watched) GetUnseenReleases() ([]map[string]string, error) {
 	// Keep trying for up to 30 seconds (In case there is an upstream site issue)
+	slog.Debug("Getting unseen")
 	maxWait := 6
 	for maxWait > 0 {
 		err := w.update()
@@ -71,6 +74,11 @@ func (w *watched) GetUnseenReleases() ([]map[string]string, error) {
 	}
 	unseen := []map[string]string{}
 	for i := range w.Feeds {
+		if w.Feeds[i].Feed == nil {
+			continue
+		}
+		slog.Debug("Feed", "value", w.Feeds[i].URL)
+		slog.Debug("Feed Item", "value", w.Feeds[i].Feed.Items)
 		for j := range w.Feeds[i].Feed.Items {
 			title := w.Feeds[i].Feed.Items[j].Title
 			seen, err := w.Store.CheckExists(title)
@@ -89,36 +97,52 @@ func (w *watched) GetUnseenReleases() ([]map[string]string, error) {
 			}
 		}
 	}
+	slog.Debug("Unseen count", "value", len(unseen))
 	return unseen, nil
 }
 
 // Update - fetch all items for all feeds
 func (w *watched) update() error {
+	slog.Debug("Fetching items for feeds")
 	fp := gofeed.NewParser()
+
+	// slog.Debug("Feeds: ", w.Feeds)
 	for idx := range w.Feeds {
+		slog.Debug("URL", "value", w.Feeds[idx].URL)
 		url := w.Feeds[idx].URL
-		feed, err := w.fetchURL(fp, url)
+		feed, err := fp.ParseURL(url)
 		if err != nil {
-			return fmt.Errorf("error fetching url: %s, err: %v", url, err)
+			// slog.Warn("URL Fetch Error", err.Error())
+			continue
 		}
+		// feed, err := w.fetchURL(fp, url)
+		// if err != nil {
+		// 	slog.Debug("URL Fetch Error", err.Error())
+		// 	return fmt.Errorf("error fetching url: %s, err: %v", url, err)
+		// }
+		// slog.Debug("Adding feed", feed)
 		w.Feeds[idx].Feed = feed
 	}
+
 	return nil
 }
 
 // FetchURL fetches the feed URL and also fakes the user-agent to be able
 // to retrieve data from sites like reddit.
 func (w *watched) fetchURL(fp *gofeed.Parser, url string) (feed *gofeed.Feed, err error) {
+	slog.Debug("fetching URL", "value", url)
 	client := &http.Client{}
 
+	slog.Debug("Preparing request")
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36")
-	resp, err := client.Do(req)
 
+	slog.Debug("Making Request")
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -135,6 +159,6 @@ func (w *watched) fetchURL(fp *gofeed.Parser, url string) (feed *gofeed.Feed, er
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return nil, fmt.Errorf("failed to get url %v, %v", resp.StatusCode, resp.Status)
 	}
-
+	slog.Debug("returning body")
 	return fp.Parse(resp.Body)
 }

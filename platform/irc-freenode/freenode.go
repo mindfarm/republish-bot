@@ -4,6 +4,7 @@ package irc
 import (
 	"bufio"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/textproto"
 	"strings"
@@ -18,7 +19,8 @@ type client struct {
 }
 
 // NewFreenodeClient -
-//nolint:golint
+//
+//nolint:golint,revive
 func NewFreenodeClient(username, password string) (*client, error) {
 	if username == "" {
 		return nil, fmt.Errorf("cannot create a new client, missing username")
@@ -41,6 +43,7 @@ const channel = "#go-nuts"
 func (c *client) connect() error {
 	conn, err := net.Dial("tcp", freenode)
 	if err != nil {
+		slog.Error("Unable to connect to IRC server with error", err)
 		return fmt.Errorf("unable to connect to %s with error %w", freenode, err)
 	}
 	c.conn = &conn

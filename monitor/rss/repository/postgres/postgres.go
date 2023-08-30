@@ -15,7 +15,7 @@ type pg struct {
 }
 
 // NewPGStore -
-// nolint:golint
+// nolint:golint,revive
 func NewPGStore(connStr string) (*pg, error) {
 	conn, err := sql.Open("postgres", connStr)
 	if err != nil {
