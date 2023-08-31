@@ -11,6 +11,7 @@ func Republish(platforms map[string]Platform, monitor Updates) {
 		if err != nil {
 			log.Printf("WARNING GetReleases() returned error %v", err)
 		}
+
 		for idx := range releases {
 			for k := range platforms {
 				if err := platforms[k].PublishContent(releases[idx]); err != nil {
@@ -19,6 +20,7 @@ func Republish(platforms map[string]Platform, monitor Updates) {
 			}
 		}
 		// Sleep and check again in 30 seconds
+		//nolint:gomnd
 		time.Sleep(time.Second * 30)
 	}
 }

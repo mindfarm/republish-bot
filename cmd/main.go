@@ -15,10 +15,12 @@ import (
 )
 
 func main() {
+	// slog level management.
 	var programLevel = new(slog.LevelVar)
 	h := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: programLevel})
 	slog.SetDefault(slog.New(h))
 	programLevel.Set(slog.LevelInfo)
+
 	// Collect IRC credentials
 	ircUsername := os.Getenv("IRC_USER")
 	ircPassword := os.Getenv("IRC_PASSWORD")

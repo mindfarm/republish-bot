@@ -2,6 +2,7 @@
 package twitter
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,13 +17,13 @@ type twitterClient struct {
 	*twitter.Client
 }
 
-// NewTwitterClient -
-// nolint: golint
-func NewTwitterClient(consumerKey, consumerSecret, accessToken, accessSecret string) (*twitterClient, error) {
+var ErrMissingCfg = errors.New("missing consumerKey, consumerSecret, accessToken, or accessSecret cannot continue")
 
+func NewTwitterClient(consumerKey, consumerSecret, accessToken, accessSecret string) (*twitterClient, error) {
 	if consumerKey == "" || consumerSecret == "" || accessToken == "" || accessSecret == "" {
-		return nil, fmt.Errorf("missing consumerKey, consumerSecret, accessToken, or accessSecret cannot continue")
+		return nil, ErrMissingCfg
 	}
+
 	config := oauth1.NewConfig(consumerKey, consumerSecret)
 	token := oauth1.NewToken(accessToken, accessSecret)
 	// OAuth1 http.Client will automatically authorize Requests
@@ -32,7 +33,7 @@ func NewTwitterClient(consumerKey, consumerSecret, accessToken, accessSecret str
 	return &twitterClient{twitter.NewClient(httpClient)}, nil
 }
 
-// The max length of a single tweet
+// Max length of a single tweet.
 const tweetLen = 280
 
 func (t *twitterClient) chunkContent(content string) []string {
@@ -44,22 +45,27 @@ func (t *twitterClient) chunkContent(content string) []string {
 	bottom := 0
 	runeContent := []rune(content)
 	top := tweetLen
+
 	l := len(runeContent)
 	for bottom < l {
 		if top >= l {
 			top = l
 			chunks = append(chunks, string(runeContent[bottom:top]))
+
 			break
 		}
+
 		chunk := runeContent[bottom:top]
 		// adjust the top value down to the first whitespace char
 		for i := len(chunk) - 1; i > 0; i-- {
-			r := []rune(chunk)[i]
+			r := chunk[i]
 			if unicode.IsSpace(r) {
 				top = bottom + i
+
 				break
 			}
 		}
+
 		chunks = append(chunks, string(runeContent[bottom:top]))
 		bottom = top + 1
 		top += tweetLen
@@ -68,7 +74,6 @@ func (t *twitterClient) chunkContent(content string) []string {
 	return chunks
 }
 
-// PublishContent -
 func (t *twitterClient) PublishContent(content map[string]string) error {
 	params := &twitter.StatusUpdateParams{}
 
@@ -77,6 +82,7 @@ func (t *twitterClient) PublishContent(content map[string]string) error {
 	// included in the title of the release, as is the case with go-pls)
 	if strings.ContainsAny(title, "pre") {
 		log.Printf("Twitter: Ignoring a pre-release %s", content["title"])
+
 		return nil
 	}
 
@@ -87,17 +93,20 @@ func (t *twitterClient) PublishContent(content map[string]string) error {
 		title = strings.TrimSpace(tmp[1])
 	}
 
+	//nolint:lll
 	c := strings.Join([]string{title, " is now available.", "\n\n", "Further information can be found at: ", content["link"]}, "")
 	for _, snippet := range t.chunkContent(c) {
-		tweet, resp, err := t.Statuses.Update(string(snippet), params)
+		tweet, resp, err := t.Statuses.Update(snippet, params)
 		if resp.StatusCode != http.StatusOK {
 			log.Printf("http return status was %d, with %s", resp.StatusCode, resp.Status)
 			log.Printf("accompanied with error: %v", err)
 			err = fmt.Errorf("bad status code returned with error %w", err)
+
 			return err
 		}
+
 		params.InReplyToStatusID = tweet.ID
 	}
-	return nil
 
+	return nil
 }

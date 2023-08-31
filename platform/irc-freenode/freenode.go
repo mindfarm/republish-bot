@@ -3,6 +3,7 @@ package irc
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net"
@@ -18,25 +19,27 @@ type client struct {
 	writer   *textproto.Writer
 }
 
-// NewFreenodeClient -
-//
-//nolint:golint,revive
+var ErrClientCreation = errors.New("cannot create a new client")
+
 func NewFreenodeClient(username, password string) (*client, error) {
 	if username == "" {
-		return nil, fmt.Errorf("cannot create a new client, missing username")
+		return nil, fmt.Errorf("%w, missing username", ErrClientCreation)
 	}
+
 	if password == "" {
-		return nil, fmt.Errorf("cannot create a new client, missing password")
+		return nil, fmt.Errorf("%w, missing password", ErrClientCreation)
 	}
 
 	c := &client{
 		Username: username,
 		password: password,
 	}
+
 	return c, nil
 }
 
-// chat.freenode.net on ports 6665-6667 and 8000-8002 for plain-text connections, or ports 6697, 7000 and 7070 for TLS-encrypted connections.
+// chat.freenode.net on ports 6666-6667 and 8000-8002 for plain-text
+// connections, or ports 6697, 7000 and 7070 for TLS-encrypted connections.
 const freenode = "irc.libera.chat:6665"
 const channel = "#software-development"
 
@@ -44,8 +47,10 @@ func (c *client) connect() error {
 	conn, err := net.Dial("tcp", freenode)
 	if err != nil {
 		slog.Error("Unable to connect to IRC server with error", err)
+
 		return fmt.Errorf("unable to connect to %s with error %w", freenode, err)
 	}
+
 	c.conn = &conn
 	w := bufio.NewWriter(*c.conn)
 	r := bufio.NewReader(*c.conn)
@@ -53,17 +58,30 @@ func (c *client) connect() error {
 	reader := textproto.NewReader(r)
 	// Wait for the server to send 4 lines
 	for i := 0; i < 4; i++ {
-		reader.ReadLine()
+		if _, err := reader.ReadLine(); err != nil {
+			slog.Warn("waiting for IRC server to send lines", "value", err)
+		}
 	}
+
 	// Start sending login information
-	c.writer.PrintfLine("USER %s 8 * :%s", c.Username, c.Username)
-	c.writer.PrintfLine("NICK %s", c.Username)
-	s := fmt.Sprintf("PRIVMSG NickServ :identify %s %s", c.Username, c.password)
-	c.writer.PrintfLine(s)
+	if err := c.writer.PrintfLine("USER %s 8 * :%s", c.Username, c.Username); err != nil {
+		slog.Warn("trouble writing username to IRC", "value", err)
+	}
+
+	if err := c.writer.PrintfLine("NICK %s", c.Username); err != nil {
+		slog.Warn("trouble writing nick to IRC", "value", err)
+	}
+
+	message := fmt.Sprintf("PRIVMSG NickServ :identify %s %s", c.Username, c.password)
+	if err := c.writer.PrintfLine(message); err != nil {
+		slog.Warn("trouble identifying to IRC server", "value", err)
+	}
 
 	// Join channel
-	s = fmt.Sprintf("JOIN %s", channel)
-	c.writer.PrintfLine(s)
+	message = fmt.Sprintf("JOIN %s", channel)
+	if err := c.writer.PrintfLine(message); err != nil {
+		slog.Warn("trouble joining channel", "value", err)
+	}
 
 	return nil
 }
@@ -75,6 +93,7 @@ func (c *client) PublishContent(content map[string]string) error {
 			return fmt.Errorf("cannot chat with error %w", err)
 		}
 	}
+
 	title := content["title"]
 	// Go project has a weird title structure
 	// [release-branch.go1.15] go1.15.2
@@ -83,22 +102,36 @@ func (c *client) PublishContent(content map[string]string) error {
 		title = strings.TrimSpace(tmp[1])
 	}
 	// Send release information
-	s := fmt.Sprintf("PRIVMSG %s :Blog Announcement", channel)
-	s += fmt.Sprintf(" %s is now available.", title)
-	c.writer.PrintfLine(s)
+	message := fmt.Sprintf("PRIVMSG %s :Blog Announcement", channel)
+	message += fmt.Sprintf(" %s is now available.", title)
+
+	if err := c.writer.PrintfLine(message); err != nil {
+		slog.Warn("trouble writing blog announcement", "value", err)
+	}
+
+	//nolint:gomnd
 	time.Sleep(time.Millisecond * 500)
-	s = fmt.Sprintf("PRIVMSG %s :Further information can be found at %s", channel, content["link"])
-	c.writer.PrintfLine(s)
+
+	message = fmt.Sprintf("PRIVMSG %s :Further information can be found at %s", channel, content["link"])
+	if err := c.writer.PrintfLine(message); err != nil {
+		slog.Warn("trouble writing further information", "value", err)
+	}
 	// Wait for the server - this is not good, but not getting a clear view on
 	// why the server won't print out what's sent if I disconnect before this
 	// time amount.
+	//nolint:gomnd
 	time.Sleep(time.Second * 7)
-	// return c.disconnect()
+
 	return nil
 }
 
-func (c *client) disconnect() error {
-	c.writer.PrintfLine("QUIT")
-	(*c.conn).Close()
-	return nil
-}
+// func (c *client) disconnect() {
+// 	if err := c.writer.PrintfLine("QUIT"); err != nil {
+// 		slog.Warn("trouble quitting from IRC", "value", err)
+// 	}
+
+// 	if err := (*c.conn).Close(); err != nil {
+// 		slog.Warn("trouble closing IRC connection", "value", err)
+// 	}
+
+// }

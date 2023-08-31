@@ -12,10 +12,10 @@ type fakeStorage struct{}
 var ceBool bool
 var ceErr, ciErr error
 
-func (f *fakeStorage) CheckExists(title string) (bool, error) {
+func (f *fakeStorage) CheckExists(feed, title string) (bool, error) {
 	return ceBool, ceErr
 }
-func (f *fakeStorage) CreateItem(title, content, link string) error {
+func (f *fakeStorage) CreateItem(feed, title, content, link string) error {
 
 	return ciErr
 }
