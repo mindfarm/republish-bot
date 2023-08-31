@@ -30,39 +30,43 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to create irc client with error %v", err)
 	}
+
 	platforms := map[string]republishbot.Platform{}
 	platforms["irc"] = tc
 
-	//TODO Create clients for other platforms (eg. Usenet, Slack, Direct Mail lists)
-
 	// Connect to the github specific data store
 	pgDB := os.Getenv("POSTGRES_DATABASE")
-	slog.Debug("PG", pgDB)
+
 	db, err := postgresstore.NewPGStore(pgDB)
 	if err != nil {
 		log.Fatalf("Unable to create postgres connection with error %v", err)
 	}
 
 	// Retrieve content
-	w, err := rss.NewWatched(db, releaseURLs...)
+	watched, err := rss.NewWatched(db, releaseURLs...)
 	if err != nil {
 		log.Fatalf("Unable to create new watched instance with error %v", err)
 	}
 
 	for {
+		//nolint:gomnd
+		// buffer size is arbitrarily set to '5'
+		releases := make(chan map[string]string, 5)
+
 		slog.Debug("Start of infinite loop")
-		releases, err := w.GetReleases()
-		if err != nil {
-			log.Printf("WARNING GetReleases() returned error %v", err)
-		}
-		for idx := range releases {
+
+		go watched.GetReleases(releases)
+
+		for item := range releases {
 			slog.Debug("Publishing ", "value", item["title"])
+
 			for k := range platforms {
-				if err := platforms[k].PublishContent(releases[idx]); err != nil {
-					log.Printf("WARNING PublishContent() returned error %v for %s", err, releases[idx])
+				if err := platforms[k].PublishContent(item); err != nil {
+					log.Printf("WARNING PublishContent() returned error %v for %s", err, item)
 				}
 			}
 		}
+		//nolint:gomnd
 		// Sleep and check again in 30 seconds
 		time.Sleep(time.Second * 30)
 	}
