@@ -86,7 +86,30 @@ func (c *client) connect() error {
 	return nil
 }
 
+const maxRetries = 5
+
+var ErrIRCConnection = errors.New("cannot connect to IRC")
+
 func (c *client) PublishContent(content map[string]string) error {
+	var retries int
+RETRY:
+	retries++
+
+	//nolint:gomnd
+	if retries > 3 {
+		slog.Warn("disconnecting")
+		c.disconnect()
+		time.Sleep(5 * time.Second)
+
+		c.conn = nil
+	}
+
+	if retries >= maxRetries {
+		slog.Warn("exceeded retries")
+
+		return ErrIRCConnection
+	}
+
 	if c.conn == nil {
 		err := c.connect()
 		if err != nil {
@@ -107,6 +130,8 @@ func (c *client) PublishContent(content map[string]string) error {
 
 	if err := c.writer.PrintfLine(message); err != nil {
 		slog.Warn("trouble writing blog announcement", "value", err)
+
+		goto RETRY
 	}
 
 	//nolint:gomnd
@@ -115,6 +140,8 @@ func (c *client) PublishContent(content map[string]string) error {
 	message = fmt.Sprintf("PRIVMSG %s :Further information can be found at %s", channel, content["link"])
 	if err := c.writer.PrintfLine(message); err != nil {
 		slog.Warn("trouble writing further information", "value", err)
+
+		goto RETRY
 	}
 	// Wait for the server - this is not good, but not getting a clear view on
 	// why the server won't print out what's sent if I disconnect before this
@@ -125,13 +152,12 @@ func (c *client) PublishContent(content map[string]string) error {
 	return nil
 }
 
-// func (c *client) disconnect() {
-// 	if err := c.writer.PrintfLine("QUIT"); err != nil {
-// 		slog.Warn("trouble quitting from IRC", "value", err)
-// 	}
+func (c *client) disconnect() {
+	if err := c.writer.PrintfLine("QUIT"); err != nil {
+		slog.Warn("trouble quitting from IRC", "value", err)
+	}
 
-// 	if err := (*c.conn).Close(); err != nil {
-// 		slog.Warn("trouble closing IRC connection", "value", err)
-// 	}
-
-// }
+	if err := (*c.conn).Close(); err != nil {
+		slog.Warn("trouble closing IRC connection", "value", err)
+	}
+}
