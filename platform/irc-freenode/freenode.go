@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/textproto"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -17,6 +18,8 @@ type client struct {
 	password string
 	conn     *net.Conn
 	writer   *textproto.Writer
+	reader   *textproto.Reader
+	mu       sync.RWMutex
 }
 
 var ErrClientCreation = errors.New("cannot create a new client")
@@ -43,6 +46,8 @@ func NewFreenodeClient(username, password string) (*client, error) {
 const freenode = "irc.libera.chat:6665"
 const channel = "#software-development"
 
+var ErrBadConnect = errors.New("unable to connect")
+
 func (c *client) connect() error {
 	conn, err := net.Dial("tcp", freenode)
 	if err != nil {
@@ -55,35 +60,71 @@ func (c *client) connect() error {
 	w := bufio.NewWriter(*c.conn)
 	r := bufio.NewReader(*c.conn)
 	c.writer = textproto.NewWriter(w)
-	reader := textproto.NewReader(r)
+	c.reader = textproto.NewReader(r)
 	// Wait for the server to send 4 lines
 	for i := 0; i < 4; i++ {
-		if _, err := reader.ReadLine(); err != nil {
+		if _, err := c.reader.ReadLine(); err != nil {
 			slog.Warn("waiting for IRC server to send lines", "value", err)
 		}
 	}
 
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	// Start sending login information
 	if err := c.writer.PrintfLine("USER %s 8 * :%s", c.Username, c.Username); err != nil {
 		slog.Warn("trouble writing username to IRC", "value", err)
+
+		return fmt.Errorf("%w sending username", ErrBadConnect)
 	}
 
 	if err := c.writer.PrintfLine("NICK %s", c.Username); err != nil {
 		slog.Warn("trouble writing nick to IRC", "value", err)
+
+		return fmt.Errorf("%w setting nick", ErrBadConnect)
 	}
 
 	message := fmt.Sprintf("PRIVMSG NickServ :identify %s %s", c.Username, c.password)
 	if err := c.writer.PrintfLine(message); err != nil {
 		slog.Warn("trouble identifying to IRC server", "value", err)
+
+		return fmt.Errorf("%w sending identify", ErrBadConnect)
 	}
 
 	// Join channel
 	message = fmt.Sprintf("JOIN %s", channel)
 	if err := c.writer.PrintfLine(message); err != nil {
 		slog.Warn("trouble joining channel", "value", err)
+
+		return fmt.Errorf("%w joining channel", ErrBadConnect)
 	}
 
 	return nil
+}
+
+func (c *client) watch() {
+	for {
+		data, err := c.reader.ReadLine()
+		if err != nil {
+			slog.Warn("reading from server", "value", err)
+		}
+
+		switch {
+		case strings.HasPrefix(data, "PING"):
+			go c.keepalive(data)
+		default:
+			continue
+		}
+	}
+}
+
+func (c *client) keepalive(ping string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if err := c.writer.PrintfLine(strings.Replace(ping, "PING", "PONG", 1)); err != nil {
+		slog.Warn("trouble sending PONG to IRC server", "value", err)
+	}
 }
 
 const maxRetries = 5
@@ -115,6 +156,8 @@ RETRY:
 		if err != nil {
 			return fmt.Errorf("cannot chat with error %w", err)
 		}
+
+		go c.watch()
 	}
 
 	title := content["title"]
@@ -128,8 +171,14 @@ RETRY:
 	message := fmt.Sprintf("PRIVMSG %s :Blog Announcement", channel)
 	message += fmt.Sprintf(" %s is now available.", title)
 
+	// Take write lock -
+	// do NOT defer this lock, because of the loop that will cause a deadlock.
+	c.mu.Lock()
+
 	if err := c.writer.PrintfLine(message); err != nil {
 		slog.Warn("trouble writing blog announcement", "value", err)
+
+		c.mu.Unlock()
 
 		goto RETRY
 	}
@@ -141,6 +190,8 @@ RETRY:
 	if err := c.writer.PrintfLine(message); err != nil {
 		slog.Warn("trouble writing further information", "value", err)
 
+		c.mu.Unlock()
+
 		goto RETRY
 	}
 	// Wait for the server - this is not good, but not getting a clear view on
@@ -149,10 +200,15 @@ RETRY:
 	//nolint:gomnd
 	time.Sleep(time.Second * 7)
 
+	c.mu.Unlock()
+
 	return nil
 }
 
 func (c *client) disconnect() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	if err := c.writer.PrintfLine("QUIT"); err != nil {
 		slog.Warn("trouble quitting from IRC", "value", err)
 	}
