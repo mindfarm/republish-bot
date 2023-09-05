@@ -183,7 +183,7 @@ var releaseURLs = []string{
 	"https://aphyr.com/posts.atom",
 	"https://ariya.io/index.xml",
 	"https://auth0.com/blog/rss.xml",
-	"https://aws.amazon.com/blogs/?awsf.blog-master-category=*all&awsf.blog-master-learning-levels=*all&awsf.blog-master-industry=*all&awsf.blog-master-analytics-products=*all&awsf.blog-master-artificial-intelligence=*all&awsf.blog-master-aws-cloud-financial-management=*all&awsf.blog-master-blockchain=*all&awsf.blog-master-business-applications=*all&awsf.blog-master-compute=*all&awsf.blog-master-customer-enablement=*all&awsf.blog-master-customer-engagement=*all&awsf.blog-master-database=*all&awsf.blog-master-developer-tools=*all&awsf.blog-master-devops=*all&awsf.blog-master-end-user-computing=*all&awsf.blog-master-mobile=*all&awsf.blog-master-iot=*all&awsf.blog-master-management-governance=*all&awsf.blog-master-media-services=*all&awsf.blog-master-migration-transfer=*all&awsf.blog-master-migration-solutions=*all&awsf.blog-master-networking-content-delivery=*all&awsf.blog-master-programming-language=*all&awsf.blog-master-sector=*all&awsf.blog-master-security=*all&awsf.blog-master-storage=*all",
+	"https://aws.amazon.com/blogs/?awsf.blog-master-category=*all&awsf.blog-master-learning-levels=*all&awsf.blog-master-industry=*all&awsf.blog-master-analytics-products=*all&awsf.blog-master-artificial-intelligence=*all&awsf.blog-master-aws-cloud-financial-management=*all&awsf.blog-master-blockchain=*all&awsf.blog-master-business-applications=*all&awsf.blog-master-compute=*all&awsf.blog-master-customer-enablement=*all&awsf.blog-master-customer-engagement=*all&awsf.blog-master-database=*all&awsf.blog-master-developer-tools=*all&awsf.blog-master-devops=*all&awsf.blog-master-end-user-computing=*all&awsf.blog-master-mobile=*all&awsf.blog-master-iot=*all&awsf.blog-master-management-governance=*all&awsf.blog-master-media-services=*all&awsf.blog-master-migration-transfer=*all&awsf.blog-master-migration-solutions=*all&awsf.blog-master-networking-content-delivery=*all&awsf.blog-master-programming-language=*all&awsf.blog-master-sector=*all&awsf.blog-master-security=*all&awsf.blog-master-storage=*all", //nolint:lll
 	"https://aws.amazon.com/blogs/aws/feed/",
 	"https://azure.microsoft.com/en-us/blog/",
 	"https://backtrace.io/feed/",
@@ -634,6 +634,7 @@ var releaseURLs = []string{
 	"https://www.rea-group.com/category/tech/feed/",
 	"https://www.red-lang.org/feeds/posts/default",
 	"https://www.reddit.com/r/RedditEng.atom",
+	"https://www.reddit.com/r/golang/.rss",
 	"https://www.redditinc.com/blog",
 	"https://www.rosehosting.com/blog/feed/",
 	"https://www.runtastic.com/blog/en/feed/",
@@ -664,5 +665,4 @@ var releaseURLs = []string{
 	"https://zendesk.engineering/",
 	"https://zolmeister.com/feeds/posts/default",
 	"https://zulily-tech.com/feed/",
-	//nolint:lll
 }
