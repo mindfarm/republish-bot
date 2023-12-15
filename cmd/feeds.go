@@ -577,6 +577,7 @@ var releaseURLs = []string{
 	"https://vladmihalcea.com/feed/",
 	"https://webuild.envato.com/atom.xml",
 	"https://wecode.wepay.com/feed.xml",
+	"https://writing.kemitchell.com/feed.xml",
 	"https://www.9lessons.info/feeds/posts/default",
 	"https://www.amitmerchant.com/feed.xml",
 	"https://www.andrewcbancroft.com/feed/",
@@ -637,7 +638,6 @@ var releaseURLs = []string{
 	"https://www.red-lang.org/feeds/posts/default",
 	"https://www.reddit.com/r/RedditEng.atom",
 	"https://www.reddit.com/r/golang/.rss?sort-new",
-	// "https://www.reddit.com/r/programming/.rss?sort-new",
 	"https://www.redditinc.com/blog",
 	"https://www.rosehosting.com/blog/feed/",
 	"https://www.runtastic.com/blog/en/feed/",
@@ -668,4 +668,5 @@ var releaseURLs = []string{
 	"https://zendesk.engineering/",
 	"https://zolmeister.com/feeds/posts/default",
 	"https://zulily-tech.com/feed/",
+	// "https://www.reddit.com/r/programming/.rss?sort-new",
 }
