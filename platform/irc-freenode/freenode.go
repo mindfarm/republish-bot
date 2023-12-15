@@ -44,7 +44,8 @@ func NewFreenodeClient(username, password string) (*client, error) {
 // chat.freenode.net on ports 6666-6667 and 8000-8002 for plain-text
 // connections, or ports 6697, 7000 and 7070 for TLS-encrypted connections.
 const freenode = "irc.libera.chat:6665"
-const channel = "#software-development"
+
+var channels = []string{"#software-development", "##software-development"}
 
 var ErrBadConnect = errors.New("unable to connect")
 
@@ -92,11 +93,13 @@ func (c *client) connect() error {
 	}
 
 	// Join channel
-	message = fmt.Sprintf("JOIN %s", channel)
-	if err := c.writer.PrintfLine(message); err != nil {
-		slog.Warn("trouble joining channel", "value", err)
+	for _, channel := range channels {
+		message = fmt.Sprintf("JOIN %s", channel)
+		if err := c.writer.PrintfLine(message); err != nil {
+			slog.Warn("trouble joining channel", "value", err)
 
-		return fmt.Errorf("%w joining channel", ErrBadConnect)
+			return fmt.Errorf("%w joining channel", ErrBadConnect)
+		}
 	}
 
 	return nil
@@ -160,47 +163,42 @@ RETRY:
 		go c.watch()
 	}
 
-	title := content["title"]
-	// Go project has a weird title structure
-	// [release-branch.go1.15] go1.15.2
-	tmp := strings.Split(title, "]")
-	if len(tmp) > 1 {
-		title = strings.TrimSpace(tmp[1])
-	}
-	// Send release information
-	message := fmt.Sprintf("PRIVMSG %s :Blog Announcement", channel)
-	message += fmt.Sprintf(" %s is now available.", title)
+	for _, channel := range channels {
+		// Send release information
+		message := fmt.Sprintf("PRIVMSG %s :Blog Announcement", channel)
 
-	// Take write lock -
-	// do NOT defer this lock, because of the loop that will cause a deadlock.
-	c.mu.Lock()
+		// Take write lock -
+		// do NOT defer this lock, because of the loop that will cause a deadlock.
+		c.mu.Lock()
 
-	if err := c.writer.PrintfLine(message); err != nil {
-		slog.Warn("trouble writing blog announcement", "value", err)
+		if err := c.writer.PrintfLine(message); err != nil {
+			slog.Warn("trouble writing blog announcement", "value", err)
 
+			c.mu.Unlock()
+
+			goto RETRY
+		}
+
+		//nolint:gomnd
+		time.Sleep(time.Millisecond * 500)
+
+		message = fmt.Sprintf("PRIVMSG %s :Link to blog: %s", channel, content["link"])
+		if err := c.writer.PrintfLine(message); err != nil {
+			slog.Warn("trouble writing further information", "value", err)
+
+			c.mu.Unlock()
+
+			goto RETRY
+		}
+		// Wait for the server - this is not good, but not getting a clear view on
+		// why the server won't print out what's sent if I disconnect before this
+		// time amount.
+		//nolint:gomnd
+		time.Sleep(time.Second * 7)
+
+		// Unlock the mutex
 		c.mu.Unlock()
-
-		goto RETRY
 	}
-
-	//nolint:gomnd
-	time.Sleep(time.Millisecond * 500)
-
-	message = fmt.Sprintf("PRIVMSG %s :Further information can be found at %s", channel, content["link"])
-	if err := c.writer.PrintfLine(message); err != nil {
-		slog.Warn("trouble writing further information", "value", err)
-
-		c.mu.Unlock()
-
-		goto RETRY
-	}
-	// Wait for the server - this is not good, but not getting a clear view on
-	// why the server won't print out what's sent if I disconnect before this
-	// time amount.
-	//nolint:gomnd
-	time.Sleep(time.Second * 7)
-
-	c.mu.Unlock()
 
 	return nil
 }
