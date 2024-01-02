@@ -491,6 +491,7 @@ var releaseURLs = []string{
 	"https://nickcraver.com/blog/feed.xml",
 	"https://nickdesaulniers.github.io/atom.xml",
 	"https://nordicapis.com/feed/",
+	"https://notes.eatonphil.com/rss.xml",
 	"https://nshipster.com/feed.xml",
 	"https://ocramius.github.io/atom.xml",
 	"https://oleb.net/blog/atom.xml",
