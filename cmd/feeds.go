@@ -521,6 +521,7 @@ var releaseURLs = []string{
 	"https://shopify.engineering/blog.atom",
 	"https://slack.engineering/",
 	"https://slack.engineering/feed",
+	"https://smalldatum.blogspot.com/feeds/posts/default",
 	"https://snook.ca/jonathan/index.rdf",
 	"https://snyk.io/blog/feed.xml",
 	"https://software.intel.com/en-us/blogs/feed",
