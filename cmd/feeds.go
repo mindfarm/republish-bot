@@ -291,6 +291,7 @@ var releaseURLs = []string{
 	"https://dave.cheney.net/feed",
 	"https://davidwalsh.name/feed/atom",
 	"https://deanhume.com/rss/",
+	"https://decomposition.al/atom.xml",
 	"https://deezer.io/",
 	"https://deezer.io/feed",
 	"https://deliveroo.engineering/",
